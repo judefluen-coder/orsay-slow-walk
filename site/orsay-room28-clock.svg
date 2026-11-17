@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" role="img" aria-label="钟厅空间关系示意，非实测立面">
+  <rect width="1000" height="760" fill="#162530"/>
+  <rect x="78" y="80" width="844" height="600" fill="#203a43" stroke="#ae9774" stroke-width="3"/>
+  <path d="M78 538H922M78 570H922" stroke="#b3a388" stroke-width="3"/>
+  <circle cx="500" cy="335" r="211" fill="#d6d0b4" stroke="#a1825b" stroke-width="17"/>
+  <circle cx="500" cy="335" r="177" fill="#e7e0c9" stroke="#213943" stroke-width="5"/>
+  <g stroke="#2a4149" stroke-width="5">
+    <path d="M500 158v36M500 476v36M323 335h36M641 335h36"/>
+    <path d="M375 210l23 23M602 437l23 23M625 210l-23 23M398 437l-23 23"/>
+  </g>
+  <path d="M500 335l-19-94M500 335l82 51" fill="none" stroke="#b35d48" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="500" cy="335" r="12" fill="#b35d48"/>
+  <path d="M250 640h500" stroke="#dbbc8b" stroke-width="3"/>
+  <text x="500" y="620" text-anchor="middle" fill="#ecddc1" font-family="sans-serif" font-size="24" letter-spacing="4">SALON DE L’HORLOGE</text>
+  <text x="500" y="725" text-anchor="middle" fill="#9dafb1" font-family="sans-serif" font-size="17">空间关系示意 · 非实测钟面、墙位或 2026 年陈列</text>
+</svg>
