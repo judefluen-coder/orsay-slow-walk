@@ -1,7 +1,7 @@
 {
   "entry": "index.html",
   "primarySource": "orsay.html",
-  "sourceSha256": "972eaac16c6be72bd0ce03959a65cb5a2f5a4b931fd602c35fd99893612e52d8",
+  "sourceSha256": "79db65c16f20d901b51c882befde83eff69471aafdcfef64c0e105d380a03f32",
   "scripts": [
     "orsay-catalog.js?v=bd1496501e637c1b",
     "orsay-room28.js?v=79dcf2b65e947de8",
@@ -51,9 +51,7 @@
     "orsay-gallery-layout.js?v=bab6879f1b7c6c10",
     "orsay-gallery-display.js?v=95b0cdff7e699c35",
     "orsay-architecture-refinement.js?v=868de06fbaf08251",
-    "orsay-furniture-refinement.js?v=9772afa1ce2d5b44",
-    "orsay-review-version.js?v=5000345e5005b763",
-    "orsay-review-bridge.js?v=11e9658bd2dcf75d"
+    "orsay-furniture-refinement.js?v=9772afa1ce2d5b44"
   ],
   "images": [
     "assets/completion-content/15413-2.jpg",
@@ -407,22 +405,15 @@
   ],
   "extraAssets": [
     "orsay-room28-clock.svg",
-    "orsay-collection.css",
-    "orsay-review.html",
-    "orsay-review.js",
-    "orsay-review-center.css",
-    "orsay-review.css",
-    "orsay-review-version.js"
+    "orsay-collection.css"
   ],
-  "bytes": 78945963,
-  "runtimeFiles": 407,
-  "review": {
-    "entry": "orsay-review.html",
+  "bytes": 78890526,
+  "runtimeFiles": 401,
+  "release": {
+    "kind": "public",
     "inputs": [
       "orsay.html",
-      "orsay-review.html",
       "orsay-collection.css",
-      "orsay-review.css",
       "orsay-catalog.js",
       "orsay-room28.js",
       "orsay-room29.js",
@@ -472,13 +463,10 @@
       "orsay-gallery-display.js",
       "orsay-architecture-refinement.js",
       "orsay-furniture-refinement.js",
-      "orsay-review-bridge.js",
-      "orsay-review-center.css",
-      "orsay-review.js",
       "orsay-room28-clock.svg"
     ],
-    "sha256": "1d34605be268d1d72178a1e539fce8a3728a1318b5f5fa39cb39e9f3f269697f",
+    "sha256": "d1c092cd72d6af0357a91f603fae9b033ac9924bf5ecdf2dac20785f74657059",
     "hashMethod": "canonical-cache-urls-v1",
-    "cacheKey": "1d34605be268d1d7"
+    "cacheKey": "d1c092cd72d6af03"
   }
 }

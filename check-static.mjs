@@ -33,10 +33,10 @@ function transformReferences(html,transform){
   });
 }
 const canonicalHTML=html=>transformReferences(html,withoutParameter);
-const index=read('index.html').toString('utf8'),review=read('orsay-review.html').toString('utf8');
+const index=read('index.html').toString('utf8');
 assert.equal(index,read('orsay.html').toString('utf8'),'both entry URLs serve the latest museum');
 assert.equal(digest(read('index.html')),manifest.sourceSha256);
-for(const html of [index,review])assert(!/file:\/\/|\/Users\/|localhost:\d|127\.0\.0\.1/.test(html),'no machine-specific runtime URLs');
+assert(!/file:\/\/|\/Users\/|localhost:\d|127\.0\.0\.1/.test(index),'no machine-specific runtime URLs');
 const scripts=[...index.matchAll(/<script\b[^>]*src="([^"]+)"/g)].map(m=>m[1]);
 assert.deepEqual(scripts,manifest.scripts,'manifest preserves main script order and content fingerprints');
 const runtimeFiles=[...new Set(['index.html','orsay.html',...scripts,...manifest.images,...manifest.extraAssets].map(localFile))];
@@ -47,7 +47,7 @@ for(const file of runtimeFiles){
 assert.equal(runtimeFiles.length,manifest.runtimeFiles,'runtime file count is unique and ignores URL query strings');
 assert.equal(runtimeFiles.reduce((bytes,file)=>bytes+read(file).length,0),manifest.bytes,'runtime byte count matches the package');
 const linked=[];
-for(const html of [index,review]){
+for(const html of [index]){
   transformReferences(html,(reference,key)=>{
     const url=new URL(reference.replaceAll('&amp;','&'),projectBase);
     assert(url.pathname.startsWith('/orsay-slow-walk/'),'resource remains within the GitHub Pages project');
@@ -55,9 +55,9 @@ for(const html of [index,review]){
       const file=localFile(reference);
       linked.push(file);
       assert.equal(url.searchParams.get('v'),digest(read(file)).slice(0,16),'resource URL must match its own bytes: '+file);
-      assert(runtimeFiles.includes(file),'all main/review JS and CSS are packaged: '+file);
-      if(file!=='orsay-review-version.js')assert(manifest.review.inputs.includes(file),'build ID covers linked resource: '+file);
-    }else assert.equal(url.searchParams.get('build'),manifest.review.cacheKey,'museum links and review frame use the current build');
+      assert(runtimeFiles.includes(file),'all public JS and CSS are packaged: '+file);
+      assert(manifest.release.inputs.includes(file),'build ID covers linked resource: '+file);
+    }else assert.equal(url.searchParams.get('build'),manifest.release.cacheKey,'museum links use the current public build');
     return reference;
   });
   for(const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g))if(!/\bsrc\s*=/.test(m[1]))new vm.Script(m[2]);
@@ -68,26 +68,20 @@ vm.runInNewContext(read('image-cache-manifest.js').toString('utf8'),cacheScope,{
 assert.deepEqual([...new Set(Object.values(cacheScope.window.ORSAY_LOCAL_IMAGES).map(localFile))].sort(),manifest.images);
 assert(manifest.images.length>=201,'retain the previously published image cache while expanding');
 assert(manifest.extraAssets.includes('orsay-collection.css'),'room folio stylesheet is packaged');
-const iframe=review.match(/<iframe\b[^>]*\bid="museumFrame"[^>]*\bsrc="([^"]+)"/)?.[1];
-assert(iframe,'standalone review has the actual museum frame');
-const iframeURL=new URL(iframe.replaceAll('&amp;','&'),projectBase);
-assert.equal(iframeURL.pathname,'/orsay-slow-walk/orsay.html');
-assert.equal(iframeURL.searchParams.get('review'),'1','standalone review retains inspection mode');
-assert.equal(iframeURL.searchParams.get('build'),manifest.review.cacheKey,'review requests current museum HTML');
-assert(!index.includes('href="orsay-review.html"'),'ordinary visits have no inspection UI entry');
-assert.equal(manifest.review.hashMethod,'canonical-cache-urls-v1');
-assert(!manifest.review.inputs.includes('orsay-review-version.js'),'generated version has no hash self-reference');
-for(const file of ['orsay.html','orsay-review.html'])assert(manifest.review.inputs.includes(file),'build ID includes both entry pages');
-const reviewHash=crypto.createHash('sha256');
-for(const file of manifest.review.inputs){
+assert.equal(manifest.release.kind,'public');
+assert.equal(manifest.release.hashMethod,'canonical-cache-urls-v1');
+assert(!manifest.review,'public manifest has no review entry');
+for(const file of fs.readdirSync(dist))assert(!file.startsWith('orsay-review')||file==='orsay-review-additions.js','no review center files or aliases: '+file);
+assert(!/ORSAY_REVIEW_MODE|ORSAY_REVIEW_BUILD|review-mode|orsay-review\.html|orsay-review-bridge/.test(index),'query parameters cannot activate inspection mode');
+assert(index.includes('const orsayStorageKey=key=>key;'),'ordinary visits retain their existing storage keys');
+assert(manifest.release.inputs.includes('orsay.html'),'build ID includes the public entry');
+const releaseHash=crypto.createHash('sha256');
+for(const file of manifest.release.inputs){
   const content=read(file);
-  reviewHash.update(file+'\n').update(file.endsWith('.html')?canonicalHTML(content.toString('utf8')):content).update('\n');
+  releaseHash.update(file+'\n').update(file.endsWith('.html')?canonicalHTML(content.toString('utf8')):content).update('\n');
 }
-assert.equal(reviewHash.digest('hex'),manifest.review.sha256,'review version matches all scene and tool files after removing only generated URL fingerprints');
-assert.equal(manifest.review.cacheKey,manifest.review.sha256.slice(0,16));
-const versionScope={window:{}};
-vm.runInNewContext(read('orsay-review-version.js').toString('utf8'),versionScope,{timeout:1000});
-assert.equal(versionScope.window.ORSAY_REVIEW_BUILD.sha256,manifest.review.sha256);
+assert.equal(releaseHash.digest('hex'),manifest.release.sha256,'public version matches scene files after removing only generated URL fingerprints');
+assert.equal(manifest.release.cacheKey,manifest.release.sha256.slice(0,16));
 assert(read('orsay-room28-clock.svg').toString('utf8').includes('<svg'));
 assert(!fs.existsSync(path.join(dist,'output'))&&!fs.existsSync(path.join(dist,'tmp'))&&!fs.existsSync(path.join(dist,'sources')),'only runtime assets are hosted');
-console.log(JSON.stringify({status:'PASS',entry:'index.html',scripts:scripts.length,images:manifest.images.length,cacheKey:manifest.review.cacheKey,sourceSha256:manifest.sourceSha256,bytes:manifest.bytes,browserVerified:false}));
+console.log(JSON.stringify({status:'PASS',entry:'index.html',kind:'public',scripts:scripts.length,images:manifest.images.length,cacheKey:manifest.release.cacheKey,sourceSha256:manifest.sourceSha256,bytes:manifest.bytes,browserVerified:false}));

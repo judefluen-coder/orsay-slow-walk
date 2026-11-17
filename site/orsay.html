@@ -242,11 +242,10 @@ body:has(#mapShade.open){overflow:hidden}
 .museum-map .route-map.map-label-location .map-player{r:5.8px;fill:none;stroke:#ae4f35;stroke-width:1.1}
 </style>
 <link rel="stylesheet" href="orsay-collection.css?v=62d30082b42750e7">
-<link rel="stylesheet" href="orsay-review.css?v=6dbaf5bb53d772ee">
 </head>
 <body>
 <div class="app">
-  <header class="topline"><a class="identity" href="orsay.html?build=1d34605be268d1d7"><span class="identity-mark">O</span><span class="identity-name">奥赛，慢慢逛</span></a><div class="topline-right"><span>MUSÉE D'ORSAY · PARIS</span><strong>-1 / 0 / 2 / 3 / 4 / 5 层 · 路线示意</strong></div></header>
+  <header class="topline"><a class="identity" href="orsay.html?build=d1c092cd72d6af03"><span class="identity-mark">O</span><span class="identity-name">奥赛，慢慢逛</span></a><div class="topline-right"><span>MUSÉE D'ORSAY · PARIS</span><strong>-1 / 0 / 2 / 3 / 4 / 5 层 · 路线示意</strong></div></header>
   <p id="dailyAccessNotice" class="daily-access" hidden></p>
   <section class="intro"><div><div class="eyebrow">A WALKABLE ART MUSEUM · 可行走的美术馆</div><h1>让画，值得你走过去。</h1><details class="intro-source-note"><summary>查看导览依据与未核实范围</summary><p>从底层入口信息区出发，沿中央雕塑通道探索两侧展厅、里尔与塞纳画廊；中轴可经示意楼梯前往 -1 层 Café de la Gare，无楼梯入口尚未配准。入口侧 C 交通点可经楼梯或电梯前往中层，F 交通核可通往中层、三四层新艺术展区与五层两翼。馆方导览图所列区域目前都能在 Demo 中步行抵达；门洞、楼梯造型、作品墙位及部分施工期间的入口路线仍是示意。当前参观页仍使用 2026 夏季图；十月开幕后的卡萨特、霍尔泽展区入口尚未完成现场配准，请勿把图中的候选入口当作实馆路线。点开作品可核对来源。入口信息：2 Parvis：优先、无票、团体（须预约）；定时转售票；行动不便、行李、活动请以馆方当日票务说明为准。</p></details><details class="intro-mobile-note"><summary>2026 夏季图 · 当季临展入口待核</summary><p>从底层入口信息区出发，沿中央雕塑通道探索两侧展厅、里尔与塞纳画廊；中轴可经示意楼梯前往 -1 层 Café de la Gare，无楼梯入口尚未配准。入口侧 C 交通点可经楼梯或电梯前往中层，F 交通核可通往中层、三四层新艺术展区与五层两翼。馆方导览图所列区域目前都能在 Demo 中步行抵达；门洞、楼梯造型、作品墙位及部分施工期间的入口路线仍是示意。当前参观页仍使用 2026 夏季图；十月开幕后的卡萨特、霍尔泽展区入口尚未完成现场配准，请勿把图中的候选入口当作实馆路线。点开作品可核对来源。入口信息：2 Parvis：优先、无票、团体（须预约）；定时转售票；行动不便、行李、活动请以馆方当日票务说明为准。</p></details></div><div class="intro-aside"><span>YOUR ROUTE</span><b>-1F ↔ 0F ↔ 2F ↔ 3F ↔ 4F ↔ 5F</b></div></section>
   <section id="resumeVisit" class="resume-visit" aria-labelledby="resumeTitle" hidden><div><strong id="resumeTitle">接着上次，慢慢逛。</strong><p id="resumeWhere"></p></div><div class="resume-actions"><button id="continueVisit" type="button">继续上次漫游</button><button id="startAtEntrance" type="button">从入口继续</button></div></section>
@@ -466,9 +465,7 @@ body:has(#mapShade.open){overflow:hidden}
 <script src="orsay-scene-type.js?v=fb50cbbab5209f5c"></script>
 <script src="orsay-people.js?v=ec8012719cefbeb6"></script>
 <script>
-const ORSAY_REVIEW_MODE=new URLSearchParams(location.search).get('review')==='1';
-const orsayStorageKey=key=>ORSAY_REVIEW_MODE?`orsay-review:${key}`:key;
-if(ORSAY_REVIEW_MODE)document.documentElement?.classList?.add('review-mode');
+const orsayStorageKey=key=>key;
 const $=id=>document.getElementById(id);
 const catalog=[...window.ORSAY_CATALOG];
 const campanaClockNote={
@@ -5264,7 +5261,5 @@ $('clearWalkTarget').addEventListener('click',()=>{walkTargetId=null;renderWalkT
 <script src="orsay-gallery-display.js?v=95b0cdff7e699c35"></script>
 <script src="orsay-architecture-refinement.js?v=868de06fbaf08251"></script>
 <script src="orsay-furniture-refinement.js?v=9772afa1ce2d5b44"></script>
-<script src="orsay-review-version.js?v=5000345e5005b763"></script>
-<script src="orsay-review-bridge.js?v=11e9658bd2dcf75d"></script>
 </body>
 </html>
