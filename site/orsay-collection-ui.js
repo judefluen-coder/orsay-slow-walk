@@ -92,11 +92,15 @@
     const artCount=items.filter(isArtwork).length,topicCount=items.length-artCount;
     $('collectionCount').textContent = `${artCount} 件作品${topicCount?` · ${topicCount} 篇空间与专题`:''}`;
     $('collectionResultCount').textContent = query ? `${visible.length} 条匹配` : '看完合上，继续在原地漫游';
-    $('collectionGrid').innerHTML = visible.map(work => `<li class="collection-item" data-entry-kind="${entryKind(work)}"><button type="button" class="collection-work" data-collection-work="${escape(work.id)}"><div class="collection-image">${isImage(work) ? `<img loading="lazy" decoding="async" src="${escape(imageUrl(work,700))}" alt="${escape(work.artist || '')}《${escape(work.title)}》"><span class="collection-no-image" hidden>图像暂未加载<br>可阅读档案与讲解</span>` : '<span class="collection-no-image">空间与故事<br>打开阅读</span>'}${readGuides.has(work.id) ? '<span class="collection-read">曾打开</span>' : ''}</div><p class="collection-entry-kind">${entryLabel(work,openZone)}</p><h3>${escape(work.title)}</h3><p>${escape(work.artist || '奥赛导览')}${work.year?` · ${escape(work.year)}`:''}</p><p class="collection-original">${escape(work.original||'')}</p></button><details class="collection-evidence"><summary>作品与陈列资料</summary><p>${escape(statusText(work))}</p><a href="${escape(work.locationEvidenceSource || work.source)}" target="_blank" rel="noopener noreferrer">${officialId(work)?'馆方作品档案':isArtwork(work)?'馆方展览与研究':'原始资料'} ↗${work.inventoryNumber ? ` · ${escape(work.inventoryNumber)}` : ''}</a></details></li>`).join('');
+    $('collectionGrid').innerHTML = visible.map(work => `<li class="collection-item" data-entry-kind="${entryKind(work)}"><button type="button" class="collection-work" data-collection-work="${escape(work.id)}"><div class="collection-image">${isImage(work) ? `<img loading="lazy" decoding="async" src="${escape(imageUrl(work,700))}" data-full-src="${escape(imageUrl(work,1700))}" data-remote-src="${escape(remoteImageUrl(work,700))}" alt="${escape(work.artist || '')}《${escape(work.title)}》"><span class="collection-no-image" hidden>图像暂未加载<br>可阅读档案与讲解</span>` : '<span class="collection-no-image">空间与故事<br>打开阅读</span>'}${readGuides.has(work.id) ? '<span class="collection-read">曾打开</span>' : ''}</div><p class="collection-entry-kind">${entryLabel(work,openZone)}</p><h3>${escape(work.title)}</h3><p>${escape(work.artist || '奥赛导览')}${work.year?` · ${escape(work.year)}`:''}</p><p class="collection-original">${escape(work.original||'')}</p></button><details class="collection-evidence"><summary>作品与陈列资料</summary><p>${escape(statusText(work))}</p><a href="${escape(work.locationEvidenceSource || work.source)}" target="_blank" rel="noopener noreferrer">${officialId(work)?'馆方作品档案':isArtwork(work)?'馆方展览与研究':'原始资料'} ↗${work.inventoryNumber ? ` · ${escape(work.inventoryNumber)}` : ''}</a></details></li>`).join('');
     $('collectionEmpty').hidden = visible.length > 0;
     $('collectionEmptyText').textContent = items.length ? '没有找到匹配的作品，试试作者、原文题名或清除搜索。' : '这里暂时没有作品阅读条目。可以合上作品册，继续沿通道探索。';
     $('collectionScopeText').textContent = '作品册汇集本段漫游的作品、关联阅读和空间故事。“漫游中的作品”描述本 Demo 的呈现；“延伸阅读”不代表原作在这里展出。每件作品的陈列依据可单独展开。馆方目录记录、当日现场与具体墙位分别核对，这里的计数不是实馆全部藏品或当季完整陈列总数。';
-    for (const img of $('collectionGrid').querySelectorAll('img')) img.addEventListener('error', () => {img.hidden=true;img.nextElementSibling.hidden=false;}, {once:true});
+    for (const img of $('collectionGrid').querySelectorAll('img')) {
+      const sources=[...new Set([img.getAttribute('src'),img.dataset.fullSrc,img.dataset.remoteSrc].filter(Boolean))];
+      let next=0;
+      img.addEventListener('error',()=>{if(++next<sources.length){img.src=sources[next];return}img.hidden=true;img.nextElementSibling.hidden=false;});
+    }
   }
   function open() {
     if (pendingVisitResume || stairWalk || liftRide) return;
@@ -107,7 +111,7 @@
     $('collectionShade').classList.add('open');$('openRoomCollection').setAttribute('aria-expanded','true');$('closeCollection').focus();
   }
   function close() {
-    keys.clear();readerId=null;$('collectionShade').classList.remove('open');$('openRoomCollection').setAttribute('aria-expanded','false');$('openRoomCollection').focus();
+    keys.clear();readerId=null;$('collectionShade').classList.remove('open');$('openRoomCollection').setAttribute('aria-expanded','false');focusWalkingSurface();
   }
   function view(id) {
     // A stale button cannot open a work after moving to another room.

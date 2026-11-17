@@ -242,10 +242,11 @@ body:has(#mapShade.open){overflow:hidden}
 .museum-map .route-map.map-label-location .map-player{r:5.8px;fill:none;stroke:#ae4f35;stroke-width:1.1}
 </style>
 <link rel="stylesheet" href="orsay-collection.css?v=62d30082b42750e7">
+<link rel="stylesheet" href="orsay-viewport.css?v=377e7b25ef0a0ada">
 </head>
 <body>
 <div class="app">
-  <header class="topline"><a class="identity" href="orsay.html?build=d1c092cd72d6af03"><span class="identity-mark">O</span><span class="identity-name">奥赛，慢慢逛</span></a><div class="topline-right"><span>MUSÉE D'ORSAY · PARIS</span><strong>-1 / 0 / 2 / 3 / 4 / 5 层 · 路线示意</strong></div></header>
+  <header class="topline"><a class="identity" href="orsay.html?build=827ee37611f106ab"><span class="identity-mark">O</span><span class="identity-name">奥赛，慢慢逛</span></a><div class="topline-right"><span>MUSÉE D'ORSAY · PARIS</span><strong>-1 / 0 / 2 / 3 / 4 / 5 层 · 路线示意</strong></div></header>
   <p id="dailyAccessNotice" class="daily-access" hidden></p>
   <section class="intro"><div><div class="eyebrow">A WALKABLE ART MUSEUM · 可行走的美术馆</div><h1>让画，值得你走过去。</h1><details class="intro-source-note"><summary>查看导览依据与未核实范围</summary><p>从底层入口信息区出发，沿中央雕塑通道探索两侧展厅、里尔与塞纳画廊；中轴可经示意楼梯前往 -1 层 Café de la Gare，无楼梯入口尚未配准。入口侧 C 交通点可经楼梯或电梯前往中层，F 交通核可通往中层、三四层新艺术展区与五层两翼。馆方导览图所列区域目前都能在 Demo 中步行抵达；门洞、楼梯造型、作品墙位及部分施工期间的入口路线仍是示意。当前参观页仍使用 2026 夏季图；十月开幕后的卡萨特、霍尔泽展区入口尚未完成现场配准，请勿把图中的候选入口当作实馆路线。点开作品可核对来源。入口信息：2 Parvis：优先、无票、团体（须预约）；定时转售票；行动不便、行李、活动请以馆方当日票务说明为准。</p></details><details class="intro-mobile-note"><summary>2026 夏季图 · 当季临展入口待核</summary><p>从底层入口信息区出发，沿中央雕塑通道探索两侧展厅、里尔与塞纳画廊；中轴可经示意楼梯前往 -1 层 Café de la Gare，无楼梯入口尚未配准。入口侧 C 交通点可经楼梯或电梯前往中层，F 交通核可通往中层、三四层新艺术展区与五层两翼。馆方导览图所列区域目前都能在 Demo 中步行抵达；门洞、楼梯造型、作品墙位及部分施工期间的入口路线仍是示意。当前参观页仍使用 2026 夏季图；十月开幕后的卡萨特、霍尔泽展区入口尚未完成现场配准，请勿把图中的候选入口当作实馆路线。点开作品可核对来源。入口信息：2 Parvis：优先、无票、团体（须预约）；定时转售票；行动不便、行李、活动请以馆方当日票务说明为准。</p></details></div><div class="intro-aside"><span>YOUR ROUTE</span><b>-1F ↔ 0F ↔ 2F ↔ 3F ↔ 4F ↔ 5F</b></div></section>
   <section id="resumeVisit" class="resume-visit" aria-labelledby="resumeTitle" hidden><div><strong id="resumeTitle">接着上次，慢慢逛。</strong><p id="resumeWhere"></p></div><div class="resume-actions"><button id="continueVisit" type="button">继续上次漫游</button><button id="startAtEntrance" type="button">从入口继续</button></div></section>
@@ -462,6 +463,7 @@ body:has(#mapShade.open){overflow:hidden}
 <script src="orsay-atlas.js?v=177e4cf7216335f7"></script>
 <script src="orsay-evidence.js?v=82c210f9855f8682"></script>
 <script src="image-cache-manifest.js?v=2ef55a2ecbbe117d"></script>
+<script src="image-thumbnail-manifest.js?v=98a83205cd0db870"></script>
 <script src="orsay-scene-type.js?v=fb50cbbab5209f5c"></script>
 <script src="orsay-people.js?v=ec8012719cefbeb6"></script>
 <script>
@@ -730,17 +732,28 @@ const commons='https://commons.wikimedia.org/wiki/Special:FilePath/';
 const remoteImageUrl=(work,width=1100)=>work.imageUrl||(work.file?`${commons}${encodeURIComponent(work.file)}?width=${width}`:'');
 const imageUrl=(work,width=1100)=>{
   const remote=remoteImageUrl(work,width);
-  return window.ORSAY_LOCAL_IMAGES?.[remote.split('?')[0]]||remote;
+  const original=window.ORSAY_LOCAL_IMAGES?.[remote.split('?')[0]];
+  return (width<=700&&window.ORSAY_LOCAL_THUMBNAILS?.[original])||original||remote;
 };
 const imagePage=work=>work.imagePage||(work.file?`https://commons.wikimedia.org/wiki/File:${encodeURIComponent(work.file.replaceAll(' ','_'))}`:work.source);
 const scenicImages=new Map();
-function scenicImage(work){
+function scenicImageNearby(x,width=0){
+  const padding=180,viewport=sceneViewportWorldWidth();
+  return x+width>=camera-padding&&x<=camera+viewport+padding;
+}
+function scenicImage(work,bounds=null){
   if(!scenicImages.has(work.id)){
-    const image=new Image(),remote=remoteImageUrl(work,1700),local=imageUrl(work,1700);
-    image.onerror=()=>{if(image.src!==remote){image.src=remote;return}image.failed=true};
-    image.src=local;scenicImages.set(work.id,image);
+    const image=new Image();image.decoding='async';scenicImages.set(work.id,image);
   }
-  return scenicImages.get(work.id);
+  const image=scenicImages.get(work.id);
+  if(!image.requested&&(!bounds||scenicImageNearby(bounds.x,bounds.width))){
+    image.requested=true;
+    const sources=[...new Set([imageUrl(work,640),imageUrl(work,1700),remoteImageUrl(work,700)].filter(Boolean))];
+    let next=0;
+    image.onerror=()=>{if(++next<sources.length){image.src=sources[next];return}image.failed=true};
+    if(sources.length)image.src=sources[0];else image.failed=true;
+  }
+  return image;
 }
 function showSceneImage(image,x,y,w,h){
   if(image.parentNode!==sceneImages)sceneImages.appendChild(image);
@@ -887,7 +900,7 @@ function wayfindingSign(value,x,y,w=174){
   sceneText(value,x+9,y+6,width-18,11,'#f3ecd9',600,'center','direction');
 }
 function framedArtwork(work,x,y,w,h){
-  const image=scenicImage(work),ready=image.complete&&image.naturalWidth>0&&image.naturalHeight>0;
+  const image=scenicImage(work,{x,width:w}),ready=image.complete&&image.naturalWidth>0&&image.naturalHeight>0;
   // Fit the frame to the image, inside the existing slot. Nothing moves a
   // viewing point or expands into the circulation clearance around that slot.
   const scale=ready?Math.min(w/image.naturalWidth,h/image.naturalHeight):1;
@@ -1797,7 +1810,7 @@ function drawSideRoom(t){
     const work={'43':room43Note,'44':room44Note,'45':room45Note}[number];
     label('卡尚画廊范围作品 · 数字资料台非现场设施',390,number==='44'?79:96,11,'#f4e3c7','sans-serif');
     if(number==='45'){
-      const image=scenicImage(work),height=160,width=image.complete?Math.max(30,Math.min(130,Math.round(height*image.naturalWidth/image.naturalHeight))):55;
+      const image=scenicImage(work,{x:440,width:130}),height=160,width=image.complete&&image.naturalWidth&&image.naturalHeight?Math.max(30,Math.min(130,Math.round(height*image.naturalWidth/image.naturalHeight))):55;
       drawScenicObjectImage(work,505-width/2,95,width,height);
     }
     else drawScenicObjectImage(work,420,number==='43'?108:91,170,number==='43'?88:109);
@@ -2170,7 +2183,7 @@ function drawPavilion(t){
 function middleStudyImage(work,x,y,w,h){
   // Fit the frame to the source photograph, keeping its visual bottom aligned.
   // Different aspect ratios should not become a row of identical padded boxes.
-  const image=scenicImage(work);
+  const image=scenicImage(work,{x,width:w});
   if(image.complete&&image.naturalWidth>0&&image.naturalHeight>0){
     const scale=Math.min(w/image.naturalWidth,h/image.naturalHeight);
     const width=Math.round(image.naturalWidth*scale),height=Math.round(image.naturalHeight*scale);
@@ -2372,7 +2385,7 @@ function drawSalleFetesArchitecture(){
   ctx.fillStyle='#786046';ctx.beginPath();ctx.arc(450,58,49,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#d4b57b';ctx.beginPath();ctx.arc(450,58,46,0,Math.PI*2);ctx.fill();
   ctx.fillStyle='#f1e1bd';ctx.beginPath();ctx.arc(450,58,41,0,Math.PI*2);ctx.fill();
-  const tondo=scenicImage(room51CeilingNote);
+  const tondo=scenicImage(room51CeilingNote,{x:413,width:74});
   if(tondo.complete&&tondo.naturalWidth>0&&tondo.naturalHeight>0){ctx.save();ctx.beginPath();ctx.arc(450,58,37,0,Math.PI*2);ctx.clip();const scale=Math.max(74/tondo.naturalWidth,74/tondo.naturalHeight),w=tondo.naturalWidth*scale,h=tondo.naturalHeight*scale;ctx.drawImage(tondo,450-w/2,58-h/2,w,h);ctx.restore()}
   label(scene.clientWidth<620?'《阿波罗》天顶图像 · 位置示意':'《阿波罗的战车》图像 · 天顶位置示意',scene.clientWidth<620?390:324,59,10,'#4c382e','sans-serif');
   rect(0,112,SIDE_W,5,'#f6eace');rect(0,117,SIDE_W,7,'#aa8c58');rect(0,124,SIDE_W,8,'#e8d4a8');rect(0,132,SIDE_W,5,'#b59b76');
@@ -2944,7 +2957,7 @@ function drawGroundRoom(t){
     rect(268,388,126,96,'#aa8961');rect(268,388,126,2,'#ceb18b');rect(268,390,2,92,'#c7a67d');
     rect(392,390,2,94,'#705a43');rect(270,482,122,2,'#705a43');
     rect(272,392,118,88,'#6f5740');rect(276,396,110,80,'#ad9472');rect(277,397,108,78,'#dfc8a8');
-    const standBack=player.y>=433,standImage=scenicImage(standBack?room10bCenterNotes.back:room10bCenterNotes.front);
+    const standBack=player.y>=433,standImage=scenicImage(standBack?room10bCenterNotes.back:room10bCenterNotes.front,{x:279,width:102});
     if(standImage.complete&&standImage.naturalWidth>0&&standImage.naturalHeight>0){const scale=Math.min(102/standImage.naturalWidth,72/standImage.naturalHeight),w=Math.round(standImage.naturalWidth*scale),h=Math.round(standImage.naturalHeight*scale);ctx.drawImage(standImage,330-Math.round(w/2),436-Math.round(h/2),w,h)}
     else label(standImage.failed?'图像暂缺':'画作加载中',300,391,9,'#3d4a4a','sans-serif');
     label(standBack?'画背标签细节':'画面正面',390,410,10,'#f4e3c7','sans-serif');
@@ -4771,9 +4784,9 @@ function openMuseumMap(){
   $('mapShade').classList.add('open');$('toggleMiniMap').setAttribute('aria-expanded','true');
   renderMuseumMap();$('closeMuseumMap').focus();requestAnimationFrame(centerMuseumMapOnPlayer);
 }
-function closeMuseumMap(returnToWalk=false){
+function closeMuseumMap(){
   $('mapShade').classList.remove('open');$('toggleMiniMap').setAttribute('aria-expanded','false');$('mapAreaSelect').value='here';renderMuseumMapView();keys.clear();
-  if(returnToWalk||pendingVisitResume)focusWalkingSurface();else $('toggleMiniMap').focus();
+  focusWalkingSurface();
 }
 function handleMapAction(e){
   const add=e.target.closest('[data-map-add]');
@@ -5217,7 +5230,7 @@ document.querySelectorAll('[data-move]').forEach(n=>{
 $('walkCompassMap').addEventListener('click',openMuseumMap);
 $('closeMuseumMap').addEventListener('click',()=>closeMuseumMap());
 $('mapShade').addEventListener('click',e=>{if(e.target===$('mapShade'))closeMuseumMap()});
-$('mapBeginWalk').addEventListener('click',()=>closeMuseumMap(true));
+$('mapBeginWalk').addEventListener('click',()=>closeMuseumMap());
 $('mapAreaSelect').addEventListener('change',()=>{renderMuseumMapView();$('mapViewport').scrollLeft=0;requestAnimationFrame(centerMuseumMapOnPlayer)});
 $('mapLocate').addEventListener('click',()=>{$('mapAreaSelect').value='here';renderMuseumMapView();requestAnimationFrame(centerMuseumMapOnPlayer)});
 $('mapSearch').addEventListener('input',renderMapSearch);
@@ -5256,10 +5269,11 @@ $('itineraryList').addEventListener('click',e=>{
 $('toggleAvoidStairs').addEventListener('click',()=>{avoidDemoStairs=!avoidDemoStairs;renderWalkTarget();requestVisitSave()});
 $('clearWalkTarget').addEventListener('click',()=>{walkTargetId=null;renderWalkTarget();renderItinerary();renderMapSearch();requestVisitSave();$('mapSearch').focus()});
 </script>
-<script src="orsay-collection-ui.js?v=1de70de9fa880b26"></script>
+<script src="orsay-collection-ui.js?v=b100dac2e53e76c4"></script>
 <script src="orsay-gallery-layout.js?v=bab6879f1b7c6c10"></script>
-<script src="orsay-gallery-display.js?v=95b0cdff7e699c35"></script>
+<script src="orsay-gallery-display.js?v=f12cb2ddb8818be1"></script>
 <script src="orsay-architecture-refinement.js?v=868de06fbaf08251"></script>
 <script src="orsay-furniture-refinement.js?v=9772afa1ce2d5b44"></script>
+<script src="orsay-viewport.js?v=01b2af80005ec03c"></script>
 </body>
 </html>

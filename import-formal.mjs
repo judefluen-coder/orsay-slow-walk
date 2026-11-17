@@ -47,10 +47,16 @@ const cacheScope={window:{}};
 vm.runInNewContext(fs.readFileSync(path.join(source,'image-cache-manifest.js'),'utf8'),cacheScope,{timeout:1000});
 const images=unique(Object.values(cacheScope.window.ORSAY_LOCAL_IMAGES).map(localFile)).sort();
 assert(images.length,'Image cache must not be empty');
+vm.runInNewContext(fs.readFileSync(path.join(source,'image-thumbnail-manifest.js'),'utf8'),cacheScope,{timeout:1000});
+const thumbnailEntries=Object.entries(cacheScope.window.ORSAY_LOCAL_THUMBNAILS||{}).map(([original,preview])=>[localFile(original),localFile(preview)]);
+assert.deepEqual(thumbnailEntries.map(([original])=>original).sort(),images,'Every original must have a thumbnail mapping');
+const thumbnails=unique(thumbnailEntries.map(([,preview])=>preview)).sort();
+assert(thumbnails.every(file=>/^assets\/image-thumbnails\/[a-f0-9]{24}\.webp$/.test(file)),'Thumbnail paths must refer to generated previews');
+assert(linked.includes('image-thumbnail-manifest.js'),'The museum must load its thumbnail manifest');
 // review-additions contains actual artwork records; it is not the review tool.
 const extraAssets=unique(['orsay-room28-clock.svg',...linked.filter(file=>file.endsWith('.css'))]);
 const inputs=unique(['orsay.html',...linked,...extraAssets]);
-const runtimeFiles=unique(['index.html',...inputs,...images]);
+const runtimeFiles=unique(['index.html',...inputs,...images,...thumbnails]);
 assert(!runtimeFiles.some(file=>reviewFiles.includes(file)),'Review tools must not enter the public package');
 const contents=new Map([['orsay.html',Buffer.from(html)]]);
 for(const file of runtimeFiles.filter(file=>!['index.html','orsay.html'].includes(file))){
@@ -75,8 +81,8 @@ const oldAlias=path.join(dist,'orsay-review');
 if(fs.existsSync(oldAlias)&&fs.readdirSync(oldAlias).length===0)fs.rmdirSync(oldAlias);
 fs.writeFileSync(path.join(dist,'.nojekyll'),'');
 const manifest={entry:'index.html',primarySource:'orsay.html',sourceSha256:digest(contents.get('index.html')),
-  scripts:[...html.matchAll(/<script\b[^>]*src="([^"]+)"/g)].map(match=>match[1]),images,extraAssets,
+  scripts:[...html.matchAll(/<script\b[^>]*src="([^"]+)"/g)].map(match=>match[1]),images,thumbnails,extraAssets,
   bytes:runtimeFiles.reduce((bytes,file)=>bytes+contents.get(file).length,0),runtimeFiles:runtimeFiles.length,
   release:{kind:'public',inputs,sha256,hashMethod:'canonical-cache-urls-v1',cacheKey}};
 fs.writeFileSync(path.join(root,'static-manifest.json'),JSON.stringify(manifest,null,2)+'\n');
-console.log(JSON.stringify({status:'PACKAGED',kind:'public',cacheKey,scripts:manifest.scripts.length,images:images.length,runtimeFiles:runtimeFiles.length}));
+console.log(JSON.stringify({status:'PACKAGED',kind:'public',cacheKey,scripts:manifest.scripts.length,images:images.length,thumbnails:thumbnails.length,runtimeFiles:runtimeFiles.length}));

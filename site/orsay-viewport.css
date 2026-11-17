@@ -1,0 +1,58 @@
+/* Fit a complete walking stage into the visitor's screen, without changing the museum coordinates. */
+html:not(.review-mode) .topline{height:48px;padding-inline:clamp(15px,3vw,40px)}
+html:not(.review-mode) .intro{padding:12px clamp(15px,3vw,40px);gap:18px}
+html:not(.review-mode) .intro h1{font-size:clamp(27px,3vw,38px);margin:5px 0}
+html:not(.review-mode) .intro-aside b{font-size:20px}
+html:not(.review-mode) .scene{height:var(--walking-height,calc(100dvh - 250px));width:var(--walking-width,calc(100% - 32px));min-height:0;aspect-ratio:auto;margin:10px auto 0}
+html:not(.review-mode) .scene-controls{width:var(--walking-width,calc(100% - 32px));height:64px;min-height:64px;max-height:64px;flex-basis:64px;margin:0 auto;padding:6px 12px}
+html:not(.review-mode) .under{width:var(--walking-width,calc(100% - 32px));display:flex;flex-wrap:nowrap;align-items:center;gap:12px;margin:0 auto;padding:8px 0 12px;border-top:0}
+html:not(.review-mode) .under-left{width:auto;gap:9px;flex-shrink:0}
+html:not(.review-mode) .under-left>p,html:not(.review-mode) .under .accuracy{display:none}
+html:not(.review-mode) .under-right{width:auto;flex-wrap:nowrap;gap:6px;margin:0}
+html:not(.review-mode) .journal-open{min-height:36px;padding:7px 10px}
+html:not(.review-mode) .scene-controls .nearby strong{font-size:14px;line-height:1.5}
+html:not(.review-mode) .scene-controls .nearby small{font-size:11px}
+html:not(.review-mode) .app>.gallery-meta{width:var(--walking-width,calc(100% - 12px));margin:6px auto 0;min-height:18px}
+
+@media(max-width:620px){
+  html:not(.review-mode) .topline{height:42px;padding-inline:12px}
+  html:not(.review-mode) .identity-mark{height:28px;width:28px;font-size:21px}
+  html:not(.review-mode) .identity{gap:9px}
+  html:not(.review-mode) .intro{padding:7px 12px 8px}
+  html:not(.review-mode) .intro .eyebrow{display:none}
+  html:not(.review-mode) .intro h1{font-size:25px;margin:0 0 3px}
+  html:not(.review-mode) .scene{margin-top:5px}
+  html:not(.review-mode) .app>.gallery-meta strong{font-size:13px}
+  html:not(.review-mode) .app>.gallery-meta small{font-size:9px}
+  html:not(.review-mode) .under{gap:5px;padding:6px 0 8px}
+  html:not(.review-mode) .under-right{gap:4px}
+  html:not(.review-mode) .journal-open{font-size:10px;padding:6px;min-height:40px}
+  html:not(.review-mode) .speed-control{gap:4px;font-size:11px}
+  html:not(.review-mode) .speed-control select{min-height:40px;padding:4px}
+  html:not(.review-mode) .scene-controls .nearby strong{font-size:13px;line-height:1.45;-webkit-line-clamp:3}
+  html:not(.review-mode) .scene-controls .nearby small{display:block;font-size:11px;letter-spacing:0;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+@media(max-width:620px),(pointer:coarse){
+  html:not(.review-mode) .scene-controls{height:112px;min-height:112px;max-height:112px;flex-basis:112px;padding:8px;gap:10px}
+  html:not(.review-mode) .scene-controls .pad{grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,44px);gap:4px}
+  html:not(.review-mode) .scene-actions{grid-template-rows:minmax(0,1fr) auto}
+  html:not(.review-mode) .scene-actions[data-transport="true"] .nearby small{display:none}
+  html:not(.review-mode) .scene-controls .lift-stops button{min-height:40px}
+}
+@media(max-height:520px) and (min-width:621px){
+  html:not(.review-mode) .topline{height:36px}
+  html:not(.review-mode) .intro{padding:4px 15px}
+  html:not(.review-mode) .intro .eyebrow,html:not(.review-mode) .intro-aside{display:none}
+  html:not(.review-mode) .intro h1{font-size:22px;margin:0}
+  html:not(.review-mode) .scene-controls{height:58px;min-height:58px;max-height:58px;flex-basis:58px}
+  html:not(.review-mode) .scene-controls .pad{grid-template-columns:repeat(5,40px);grid-template-rows:40px;gap:4px}
+  html:not(.review-mode) .scene-controls .pad button{grid-column:auto;grid-row:auto}
+  html:not(.review-mode) .under{padding-block:4px}
+}
+@media(max-height:520px) and (min-width:621px) and (pointer:coarse){
+  html:not(.review-mode) .scene-controls{height:80px;min-height:80px;max-height:80px;flex-basis:80px}
+  html:not(.review-mode) .scene-actions{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:minmax(0,1fr) auto;column-gap:10px}
+  html:not(.review-mode) .scene-controls .lift-stops{grid-column:2;grid-row:1;width:auto}
+  html:not(.review-mode) .scene-controls .walk-compass{grid-column:1 / -1;grid-row:2}
+  html:not(.review-mode) .scene-controls .nearby small{display:none}
+}

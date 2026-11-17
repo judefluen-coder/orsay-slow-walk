@@ -39,7 +39,8 @@ assert.equal(digest(read('index.html')),manifest.sourceSha256);
 assert(!/file:\/\/|\/Users\/|localhost:\d|127\.0\.0\.1/.test(index),'no machine-specific runtime URLs');
 const scripts=[...index.matchAll(/<script\b[^>]*src="([^"]+)"/g)].map(m=>m[1]);
 assert.deepEqual(scripts,manifest.scripts,'manifest preserves main script order and content fingerprints');
-const runtimeFiles=[...new Set(['index.html','orsay.html',...scripts,...manifest.images,...manifest.extraAssets].map(localFile))];
+assert(Array.isArray(manifest.thumbnails),'The package records thumbnail assets separately from originals');
+const runtimeFiles=[...new Set(['index.html','orsay.html',...scripts,...manifest.images,...manifest.thumbnails,...manifest.extraAssets].map(localFile))];
 for(const file of runtimeFiles){
   const stat=fs.statSync(path.join(dist,file));
   assert(stat.isFile()&&stat.size>0,file);
@@ -66,6 +67,12 @@ for(const script of new Set(linked.filter(file=>file.endsWith('.js'))))new vm.Sc
 const cacheScope={window:{}};
 vm.runInNewContext(read('image-cache-manifest.js').toString('utf8'),cacheScope,{timeout:1000});
 assert.deepEqual([...new Set(Object.values(cacheScope.window.ORSAY_LOCAL_IMAGES).map(localFile))].sort(),manifest.images);
+vm.runInNewContext(read('image-thumbnail-manifest.js').toString('utf8'),cacheScope,{timeout:1000});
+const thumbnailEntries=Object.entries(cacheScope.window.ORSAY_LOCAL_THUMBNAILS||{}).map(([original,preview])=>[localFile(original),localFile(preview)]);
+assert.deepEqual(thumbnailEntries.map(([original])=>original).sort(),manifest.images,'Thumbnail mapping covers every packaged original');
+assert.deepEqual([...new Set(thumbnailEntries.map(([,preview])=>preview))].sort(),manifest.thumbnails,'Thumbnail asset list is complete and deduplicated');
+assert(manifest.thumbnails.every(file=>/^assets\/image-thumbnails\/[a-f0-9]{24}\.webp$/.test(file)),'Only generated preview paths belong in thumbnails');
+assert(linked.includes('image-thumbnail-manifest.js'),'The museum loads the packaged thumbnail manifest');
 assert(manifest.images.length>=201,'retain the previously published image cache while expanding');
 assert(manifest.extraAssets.includes('orsay-collection.css'),'room folio stylesheet is packaged');
 assert.equal(manifest.release.kind,'public');
@@ -84,4 +91,4 @@ assert.equal(releaseHash.digest('hex'),manifest.release.sha256,'public version m
 assert.equal(manifest.release.cacheKey,manifest.release.sha256.slice(0,16));
 assert(read('orsay-room28-clock.svg').toString('utf8').includes('<svg'));
 assert(!fs.existsSync(path.join(dist,'output'))&&!fs.existsSync(path.join(dist,'tmp'))&&!fs.existsSync(path.join(dist,'sources')),'only runtime assets are hosted');
-console.log(JSON.stringify({status:'PASS',entry:'index.html',kind:'public',scripts:scripts.length,images:manifest.images.length,cacheKey:manifest.release.cacheKey,sourceSha256:manifest.sourceSha256,bytes:manifest.bytes,browserVerified:false}));
+console.log(JSON.stringify({status:'PASS',entry:'index.html',kind:'public',scripts:scripts.length,images:manifest.images.length,thumbnails:manifest.thumbnails.length,cacheKey:manifest.release.cacheKey,sourceSha256:manifest.sourceSha256,bytes:manifest.bytes,browserVerified:false}));

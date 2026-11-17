@@ -155,7 +155,7 @@
     // remains an intact photograph; its centimetre height is shown on the label.
     const objectHeight=Number(work.dimensionsCm?.height),smallObject=!foreground&&h>120&&objectHeight>0&&objectHeight<=65;
     const photoHeight=smallObject?Math.min(h,80):h;
-    const image=scenicImage(work);showSceneImage(image,x,base-photoHeight,w,photoHeight);image.style.objectPosition='center bottom';
+    const image=scenicImage(work,{x,width:w});showSceneImage(image,x,base-photoHeight,w,photoHeight);image.style.objectPosition='center bottom';
     if(image.complete&&image.naturalWidth){
       const ratio=Math.min(w/image.naturalWidth,photoHeight/image.naturalHeight),iw=image.naturalWidth*ratio,ih=image.naturalHeight*ratio;
       ctx.drawImage(image,Math.round(center-iw/2),Math.round(base-ih),Math.round(iw),Math.round(ih));
