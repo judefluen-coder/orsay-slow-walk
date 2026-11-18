@@ -1,7 +1,7 @@
 {
   "entry": "index.html",
   "primarySource": "orsay.html",
-  "sourceSha256": "d00397c221cdf8240ef31ea10dc729462dee3ad2e8bb43e87d82076555e307c1",
+  "sourceSha256": "18547c1d9b14087b325c113db655f202e2bf50c9c1ad05fafaf5dac5efa3aa66",
   "scripts": [
     "orsay-catalog.js?v=bd1496501e637c1b",
     "orsay-room28.js?v=79dcf2b65e947de8",
@@ -53,6 +53,7 @@
     "orsay-gallery-display.js?v=f12cb2ddb8818be1",
     "orsay-architecture-refinement.js?v=868de06fbaf08251",
     "orsay-furniture-refinement.js?v=9772afa1ce2d5b44",
+    "orsay-continuous-rooms.js?v=3ddac90b7563099c",
     "orsay-viewport.js?v=01b2af80005ec03c"
   ],
   "images": [
@@ -759,8 +760,8 @@
     "orsay-collection.css",
     "orsay-viewport.css"
   ],
-  "bytes": 88915196,
-  "runtimeFiles": 751,
+  "bytes": 88926881,
+  "runtimeFiles": 752,
   "release": {
     "kind": "public",
     "inputs": [
@@ -817,11 +818,12 @@
       "orsay-gallery-display.js",
       "orsay-architecture-refinement.js",
       "orsay-furniture-refinement.js",
+      "orsay-continuous-rooms.js",
       "orsay-viewport.js",
       "orsay-room28-clock.svg"
     ],
-    "sha256": "827ee37611f106ab1c74e931dabc12409f8d91374ce66659c4d32dfff10d2d4d",
+    "sha256": "dcb16d627366631b6080fd2be9c7b2230ce532db24f2d754d645e71490b6583e",
     "hashMethod": "canonical-cache-urls-v1",
-    "cacheKey": "827ee37611f106ab"
+    "cacheKey": "dcb16d627366631b"
   }
 }

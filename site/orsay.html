@@ -246,7 +246,7 @@ body:has(#mapShade.open){overflow:hidden}
 </head>
 <body>
 <div class="app">
-  <header class="topline"><a class="identity" href="orsay.html?build=827ee37611f106ab"><span class="identity-mark">O</span><span class="identity-name">奥赛，慢慢逛</span></a><div class="topline-right"><span>MUSÉE D'ORSAY · PARIS</span><strong>-1 / 0 / 2 / 3 / 4 / 5 层 · 路线示意</strong></div></header>
+  <header class="topline"><a class="identity" href="orsay.html?build=dcb16d627366631b"><span class="identity-mark">O</span><span class="identity-name">奥赛，慢慢逛</span></a><div class="topline-right"><span>MUSÉE D'ORSAY · PARIS</span><strong>-1 / 0 / 2 / 3 / 4 / 5 层 · 路线示意</strong></div></header>
   <p id="dailyAccessNotice" class="daily-access" hidden></p>
   <section class="intro"><div><div class="eyebrow">A WALKABLE ART MUSEUM · 可行走的美术馆</div><h1>让画，值得你走过去。</h1><details class="intro-source-note"><summary>查看导览依据与未核实范围</summary><p>从底层入口信息区出发，沿中央雕塑通道探索两侧展厅、里尔与塞纳画廊；中轴可经示意楼梯前往 -1 层 Café de la Gare，无楼梯入口尚未配准。入口侧 C 交通点可经楼梯或电梯前往中层，F 交通核可通往中层、三四层新艺术展区与五层两翼。馆方导览图所列区域目前都能在 Demo 中步行抵达；门洞、楼梯造型、作品墙位及部分施工期间的入口路线仍是示意。当前参观页仍使用 2026 夏季图；十月开幕后的卡萨特、霍尔泽展区入口尚未完成现场配准，请勿把图中的候选入口当作实馆路线。点开作品可核对来源。入口信息：2 Parvis：优先、无票、团体（须预约）；定时转售票；行动不便、行李、活动请以馆方当日票务说明为准。</p></details><details class="intro-mobile-note"><summary>2026 夏季图 · 当季临展入口待核</summary><p>从底层入口信息区出发，沿中央雕塑通道探索两侧展厅、里尔与塞纳画廊；中轴可经示意楼梯前往 -1 层 Café de la Gare，无楼梯入口尚未配准。入口侧 C 交通点可经楼梯或电梯前往中层，F 交通核可通往中层、三四层新艺术展区与五层两翼。馆方导览图所列区域目前都能在 Demo 中步行抵达；门洞、楼梯造型、作品墙位及部分施工期间的入口路线仍是示意。当前参观页仍使用 2026 夏季图；十月开幕后的卡萨特、霍尔泽展区入口尚未完成现场配准，请勿把图中的候选入口当作实馆路线。点开作品可核对来源。入口信息：2 Parvis：优先、无票、团体（须预约）；定时转售票；行动不便、行李、活动请以馆方当日票务说明为准。</p></details></div><div class="intro-aside"><span>YOUR ROUTE</span><b>-1F ↔ 0F ↔ 2F ↔ 3F ↔ 4F ↔ 5F</b></div></section>
   <section id="resumeVisit" class="resume-visit" aria-labelledby="resumeTitle" hidden><div><strong id="resumeTitle">接着上次，慢慢逛。</strong><p id="resumeWhere"></p></div><div class="resume-actions"><button id="continueVisit" type="button">继续上次漫游</button><button id="startAtEntrance" type="button">从入口继续</button></div></section>
@@ -1531,9 +1531,9 @@ function cafeAndCorner(){
   label('↓ 卡尚画廊入口短段 · 接点示意',CAFE_CACHIN_PORTAL_X-287,515,11,'#f2f5f7','sans-serif');
 }
 function casework(){rect(1130,394,140,8,'#9aaba8');rect(1140,402,120,26,'#6b9b9e88');rect(1134,428,132,7,'#6b6e66');rect(1145,435,8,19,'#4b4947');rect(1248,435,8,19,'#4b4947');rect(1460,407,42,9,'#d15b50');rect(1455,416,52,27,'#a63637');rect(1459,443,7,14,'#3d3436');rect(1496,443,7,14,'#3d3436')}
-function pixelVisitor(x,y,facing,step,coat,scale=studyScale,role='visitor',appearance='player'){
-  if(window.ORSAY_PEOPLE)return window.ORSAY_PEOPLE.draw({x,y,facing,step,coat,scale,role,appearance},rect,pigmentShade);
-  const p=(dx,dy,w,h,color)=>rect(x+dx*scale,y+dy*scale,w*scale,h*scale,color);
+function pixelVisitor(x,y,facing,step,coat,scale=studyScale,role='visitor',appearance='player',paint=rect){
+  if(window.ORSAY_PEOPLE)return window.ORSAY_PEOPLE.draw({x,y,facing,step,coat,scale,role,appearance},paint,pigmentShade);
+  const p=(dx,dy,w,h,color)=>paint(x+dx*scale,y+dy*scale,w*scale,h*scale,color);
   const side=facing==='left'||facing==='right',right=facing==='right',skin=role==='guest'?'#b98768':'#c99b79';
   const dark=pigmentShade(coat,-.24),light=pigmentShade(coat,.18),stride=step?2:0;
   // Small stepped silhouettes, not blurred blobs; all characters use the same
@@ -1590,7 +1590,10 @@ function visitor(x,y,coat,facing='down',role='visitor',appearance='player'){
 function sprite(t){
   if(!stairWalk&&!cachinBendWalk){drawSideAffordances();drawDownExitCues()}
   const x=Math.round(player.x),y=Math.round(stairWalk||cachinBendWalk?player.y:415+(player.y-281)*205/339),step=keys.size>0&&Math.floor(t/120)%2;
-  pixelVisitor(x,y,player.facing,step,'#466861');
+  if(!window.ORSAY_CONTINUOUS_ROOMS?.capturing){
+    pixelVisitor(x,y,player.facing,step,'#466861');
+    window.ORSAY_CONTINUOUS_ROOMS?.drawPlayerFragment(x,y,player.facing,step,'#466861');
+  }
 }
 // Circulation furniture is anchored to the same 415 px floor line as the galleries.
 // These details express use and depth, not measured door positions.
@@ -3198,6 +3201,7 @@ function drawBase(t){
 }
 const passageSigns={wing:['SALLES 38–47',480],middleWing:['SALLES 68–72',400],terrace1880:['SALLES 68–72',400],westMiddleWing:['SALLES 61–66',340],middleSouthWing:['SALLES 55–60',340],groundAisle:['SALLES 1–7 · 11–14',320],lille1:['GALERIE DE LILLE',320],lille2:['SALLES 9 · 10a · 10b',320],seine1:['GALERIE DE SEINE',320],seine2:['GALERIE DE SEINE',320]};
 function drawSceneBoundary(){
+  if(window.ORSAY_CONTINUOUS_ROOMS?.active()){$('sceneBoundary').hidden=true;return}
   // The viewport outside a short scene is a solid cutaway, not extra museum
   // floor or a doorway. The neutral stone-colored edge is presentation chrome, not museum
   // paint. Keep the actual world, artwork scale and camera intact.
@@ -3228,14 +3232,21 @@ function drawSceneBoundary(){
   }
 }
 function draw(t){
+  if(!window.ORSAY_CONTINUOUS_ROOMS?.capturing)window.ORSAY_CONTINUOUS_ROOMS?.beforeDraw(t);
   window.ORSAY_SCENE_TYPE?.begin();
   visibleSceneImages.clear();
   drawBase(t);
   syncSceneImages();
   drawSceneBoundary();
   if(stairWalk||cachinBendWalk){window.ORSAY_SCENE_TYPE?.sync();return}
-  if(/^room\d+[a-z]*$/.test(player.zone)||/^west\d+$/.test(player.zone)||player.zone==='west')roomPlaque(room(),12,188);
-  if(player.zone==='main')for(const [number,x] of [['35',22],['36',ROOM_START+24],['37',ROOM_END+24]])roomPlaque(number,x,188);
+  if(/^room\d+[a-z]*$/.test(player.zone)||/^west\d+$/.test(player.zone)||player.zone==='west'){
+    const continuous=window.ORSAY_CONTINUOUS_ROOMS?.active();
+    roomPlaque(room(),continuous?64:12,continuous?112:188);
+  }
+  if(player.zone==='main')for(const [number,x] of [['35',22],['36',ROOM_START+24],['37',ROOM_END+24]]){
+    const seam=number==='35'&&window.ORSAY_CONTINUOUS_ROOMS?.active();
+    roomPlaque(number,seam?64:x,seam?112:188);
+  }
   const passage=passageSigns[player.zone];if(passage)wayfindingSign(passage[0],passage[1],101,220);
   if(player.zone==='coreC0'||player.zone==='coreC2'||player.zone==='coreC5')wayfindingSign(`C · ${floorNumber(player.zone)} ÉTAGE`,390,101,184);
   if(player.zone==='coreD2'||player.zone==='coreD5')wayfindingSign(`D · ${floorNumber(player.zone)} ÉTAGE`,390,101,184);
@@ -3243,6 +3254,7 @@ function draw(t){
   if(player.zone==='groundCafe')wayfindingSign('CAFÉ DE LA GARE',300,118,214);
   if(player.zone==='museumRestaurant')wayfindingSign('RESTAURANT',310,118,190);
   window.ORSAY_SCENE_TYPE?.sync();
+  if(!window.ORSAY_CONTINUOUS_ROOMS?.capturing)window.ORSAY_CONTINUOUS_ROOMS?.afterDraw(t);
 }
 function room(){return cachinBendWalk?(cachinBendWalk.progress>=1?'cachin':'passage'):stairWalk?.kind==='bridge'?stairWalk.from:stairWalk?.kind==='c-core'?stairWalk.from:stairWalk?.kind==='cafe'?(stairWalk.from==='groundAisle'?'sculptureAisle':'groundCafe'):westZones.includes(player.zone)?(player.zone==='west'?'34':player.zone.slice(4)):player.zone==='groundAisle'&&player.x>=600?'sculptureAisle':[...liftFloors,'pav3','pav4','rodin','tower5','tower2','groundAisle','groundEntrance','groundCafe','coreC0','coreC2','coreC5','coreD2','coreD5','museumRestaurant','pav2','lille1','lille2','seine1','seine2','tempI','tempII','terrace1870','terrace1880','paris','cafeWest','terrace5'].includes(player.zone)?player.zone:player.zone==='feteHall'?'51':player.zone==='medalBridge'?'50':player.zone==='middleSouthWing'?'middleSouthPassage':player.zone==='westMiddleWing'?'middleWestPassage':player.zone==='middleWing'?'middlePassage':player.zone==='wing'?(player.x>CACHIN_BEND_X?'cachin':'passage'):player.zone.startsWith('room')?player.zone.slice(4):player.x<ROOM_START?'35':player.x<ROOM_END?'36':player.x<ROOM37_END?'37':'cafe'}
 const mapTrace=[{at:54,x:42,y:20},{at:ROOM_START,x:67,y:34},{at:ROOM_END,x:106,y:88},{at:ROOM37_END,x:128,y:105},{at:W-56,x:148,y:123}];
@@ -3710,6 +3722,8 @@ function setRoomUI(){
 }
 function sceneViewportWorldWidth(){return scene.clientWidth/Math.max(.01,scene.clientHeight/H)}
 function positionWorld(worldWidth){
+  const continuous=window.ORSAY_CONTINUOUS_ROOMS?.preparePosition(worldWidth);
+  if(continuous)return continuous;
   const scale=Math.max(.01,scene.clientHeight/H),viewport=scene.clientWidth/scale;
   camera=Math.max(0,Math.min(worldWidth-viewport,player.x-viewport*.43));
   const center=Math.max(0,(viewport-worldWidth)/2);
@@ -3748,9 +3762,9 @@ function tick(t){
   if(vx&&vy){vx*=.707;vy*=.707}
   if(vy)player.facing=vy<0?'up':'down';else if(vx)player.facing=vx<0?'left':'right';
   const nx=player.x+vx*step;
-  if(player.zone==='main'&&vx<0&&nx<54&&player.y>=350&&player.y<=455){player.zone='west';player.x=westWidth()-56;lastRoom='';lastNearby=''}
-  else if(player.zone==='west28'&&vx<0&&nx<54&&player.y>=350&&player.y<=455){player.zone='core5';player.x=SIDE_W-56;lastRoom='';lastNearby=''}
-  else if(player.zone==='core5'&&vx>0&&nx>SIDE_W-56&&player.y>=350&&player.y<=455){player.zone='west28';player.x=54;lastRoom='';lastNearby=''}
+  if(player.zone==='main'&&vx<0&&nx<54&&player.y>=350&&player.y<=455){player.zone='west';player.x=westWidth()-56+(nx-54);lastRoom='';lastNearby=''}
+  else if(player.zone==='west28'&&vx<0&&nx<54&&player.y>=350&&player.y<=455){player.zone='core5';player.x=SIDE_W-56+(nx-54);lastRoom='';lastNearby=''}
+  else if(player.zone==='core5'&&vx>0&&nx>SIDE_W-56&&player.y>=350&&player.y<=455){player.zone='west28';player.x=54+(nx-(SIDE_W-56));lastRoom='';lastNearby=''}
   else if(player.zone==='core2'&&vx>0&&nx>SIDE_W-56&&player.y>=350&&player.y<=455){stairWalk={from:'core2',to:'rodin',progress:0,kind:'bridge'};player.x=120;player.y=204;lastRoom='';lastNearby=''}
   else if((player.zone==='core3'||player.zone==='core4')&&vx>0&&nx>SIDE_W-56&&player.y>=350&&player.y<=455){player.zone=player.zone==='core3'?'pav3':'pav4';player.x=54;lastRoom='';lastNearby=''}
   else if((player.zone==='pav3'||player.zone==='pav4')&&vx<0&&nx<54&&player.y>=350&&player.y<=455){player.zone=player.zone==='pav3'?'core3':'core4';player.x=SIDE_W-56;lastRoom='';lastNearby=''}
@@ -3802,8 +3816,8 @@ function tick(t){
   else if(middleSouthOuterPrev[room()]&&vx<0&&nx<54&&player.y>=350&&player.y<=455){player.zone=`room${middleSouthOuterPrev[room()]}`;player.x=SIDE_W-56;lastRoom='';lastNearby=''}
   else if((westMiddleInnerNext[room()]||westMiddleOuterNext[room()])&&vx>0&&nx>SIDE_W-56&&player.y>=350&&player.y<=455){player.zone=`room${westMiddleInnerNext[room()]||westMiddleOuterNext[room()]}`;player.x=54;lastRoom='';lastNearby=''}
   else if((westMiddleInnerPrev[room()]||westMiddleOuterPrev[room()])&&vx<0&&nx<54&&player.y>=350&&player.y<=455){player.zone=`room${westMiddleInnerPrev[room()]||westMiddleOuterPrev[room()]}`;player.x=SIDE_W-56;lastRoom='';lastNearby=''}
-  else if(westZones.includes(player.zone)&&vx<0&&nx<54&&player.y>=350&&player.y<=455&&room()!=='28'){player.zone=westZoneFor(String(Number(room())-1));player.x=westWidth()-56;lastRoom='';lastNearby=''}
-  else if(westZones.includes(player.zone)&&vx>0&&nx>westWidth()-56&&player.y>=350&&player.y<=455){const next=Number(room())+1;player.zone=next===35?'main':westZoneFor(String(next));player.x=54;lastRoom='';lastNearby=''}
+  else if(westZones.includes(player.zone)&&vx<0&&nx<54&&player.y>=350&&player.y<=455&&room()!=='28'){player.zone=westZoneFor(String(Number(room())-1));player.x=westWidth()-56+(nx-54);lastRoom='';lastNearby=''}
+  else if(westZones.includes(player.zone)&&vx>0&&nx>westWidth()-56&&player.y>=350&&player.y<=455){const next=Number(room())+1,overflow=nx-(westWidth()-56);player.zone=next===35?'main':westZoneFor(String(next));player.x=54+overflow;lastRoom='';lastNearby=''}
   else if(player.zone==='wing'&&vx>0&&player.x<=CACHIN_BEND_X&&nx>CACHIN_BEND_X){player.x=CACHIN_BEND_X}
   else if(player.zone==='wing'&&vx<0&&player.x>CACHIN_BEND_X&&nx<=CACHIN_BEND_X){}
   else if(player.zone==='wing'&&vx>0&&nx>WING_W-56&&player.y>=350&&player.y<=455){player.zone='coreC5';player.x=54;lastRoom='';lastNearby=''}
@@ -5274,6 +5288,7 @@ $('clearWalkTarget').addEventListener('click',()=>{walkTargetId=null;renderWalkT
 <script src="orsay-gallery-display.js?v=f12cb2ddb8818be1"></script>
 <script src="orsay-architecture-refinement.js?v=868de06fbaf08251"></script>
 <script src="orsay-furniture-refinement.js?v=9772afa1ce2d5b44"></script>
+<script src="orsay-continuous-rooms.js?v=3ddac90b7563099c"></script>
 <script src="orsay-viewport.js?v=01b2af80005ec03c"></script>
 </body>
 </html>
